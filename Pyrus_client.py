@@ -1,13 +1,15 @@
 import requests
 
+from pathlib import Path
 from loguru import logger
+from pprint import pprint
 
 
 class Pyrus:
-    def __init__(self, url: str):
+    def __init__(self, url: Path):
         with open(url, "r") as fp:
             creds = fp.readlines()
-        self.token =Pyrus.__auth(creds[0].strip(), creds[1])
+        self.token = Pyrus.__auth(creds[0].strip(), creds[1])
         self.default_headers = {"Content-Type": "application/json",
                                 "Authorization": self.token}
 
@@ -27,7 +29,8 @@ class Pyrus:
 
     def get_register(self, form_id: int):
         response = requests.post(f"https://api.pyrus.com/v4/forms/{form_id}/register",
-                                 headers=self.default_headers)
+                                 headers=self.default_headers,
+                                 json={"include_archived": "y"})
         if response.ok:
             logger.info(f"register {form_id} got")
             return response
@@ -59,7 +62,8 @@ class Pyrus:
         if response.ok:
             return response.__dict__
         else:
-            logger.debug("get_file don't work")
+            logger.error("get_file don't work")
+            pprint(response.__dict__)
 
 
 

@@ -5,7 +5,8 @@ from loguru import logger
 
 
 def main():
-    pyrus_client = Pyrus(r"C:\Users\tuzle\Desktop\creds.txt")
+    url = Path("creds.txt")
+    pyrus_client = Pyrus(url)
     tickets = pyrus_client.collect_tickets(1203495)
 
     id_and_name_list: list[dict] = list()
@@ -26,16 +27,18 @@ def main():
 
     if not dir.exists():
         dir.mkdir()
+        logger.info("make dir")
     for value in id_and_name_list:
         photo = pyrus_client.get_file(value['id'])
         file_path = dir / value['name']
         with open(file_path, "wb") as fp:
             fp.write(photo['_content'])
-    logger.info("make dir and save fields")
+            logger.info(f"save photo {value['name']}")
 
     my_file = open("last_upload.txt", "w+")
     my_file.write(f"{timestamp}")
     my_file.close()
+    logger.info("make last upload info")
 
 
 if __name__ == "__main__":
